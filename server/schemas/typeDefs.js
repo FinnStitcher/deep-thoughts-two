@@ -33,9 +33,15 @@ type Query {
     thoughts(username: String): [Thought]
     thought(_id: ID!): Thought
 }
+
+type Mutation {
+    login(email: String!, password: String!): User
+    addUser(username: String!, email: String!, password: String!): User
+}
 `;
 // type Query = defining a query that will connect to a resolver
 // type Thought = defining what a thought should look like
 // naming individual queries and identifying what types of data should be returned
+// the use of bangs here to require certain fields helps with data validation!
 
 module.exports = typeDefs;
