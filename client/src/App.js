@@ -10,10 +10,9 @@ import Footer from './components/Footer';
 
 import Home from './pages/Home';
 
-// connecting the frontend to the graphql thingy
-// absolute link bc react runs on localhost:3000
+// proxy property in package.json means we can use a relative path
 const httpLink = createHttpLink({
-    uri: 'http://localhost:3001/graphql'
+    uri: '/graphql'
 });
 
 // instantiate apollo instance w/ cache
