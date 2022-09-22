@@ -10,7 +10,6 @@ const Home = () => {
 
 	// if data exists, put data.thoughts in here, otherwise empty array
 	const thoughts = data?.thoughts || [];
-	console.log(thoughts);
 
 	return (
 		<main>

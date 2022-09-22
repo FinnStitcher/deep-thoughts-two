@@ -1,5 +1,6 @@
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
+const path = require('path');
 
 const { typeDefs, resolvers } = require('./schemas');
 const { authMiddleware } = require('./utils/auth');
@@ -27,6 +28,17 @@ const startApolloServer = async (typeDefs, resolvers) => {
 	// make the express server its middleware
 	server.applyMiddleware({ app });
 };
+
+// serve up frontend stuff from the build folder
+// these will only run in production
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../client/build')));
+}
+
+// any get requests will be sent the react frontend
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
 
 db.once('open', () => {
     app.listen(PORT, () => {
