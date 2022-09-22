@@ -2,6 +2,7 @@ const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 
 const { typeDefs, resolvers } = require('./schemas');
+const { authMiddleware } = require('./utils/auth');
 const db = require('./config/connection');
 
 const PORT = process.env.PORT || 3001;
@@ -9,7 +10,9 @@ const PORT = process.env.PORT || 3001;
 // create apollo server...
 const server = new ApolloServer({
 	typeDefs,
-	resolvers
+	resolvers,
+    context: authMiddleware
+    // every request coming into the server will go through authMiddleware, and the return value of that function will be available to all resolvers as the context param
 });
 // and the express server
 const app = express();

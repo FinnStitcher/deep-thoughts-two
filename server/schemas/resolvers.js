@@ -1,10 +1,24 @@
 const {User, Thought} = require('../models');
 const {AuthenticationError} = require('apollo-server-express');
+const {signToken} = require('../utils/auth');
 
 // akin to a controller, huh? a bunch of methods bundled together...
 
 const resolvers = {
     Query: {
+        me: async (parent, args, context) => {
+            if (context.user) {
+                const userData = await User.findOne({})
+                .select('-__v -password')
+                .populate('thoughts')
+                .populate('friends');
+
+                return userData;
+            }
+
+            throw new AuthenticationError('Not logged in.');
+        },
+
         users: async () => {
             return User.find()
             .select('-__v -password')
@@ -35,8 +49,10 @@ const resolvers = {
     Mutation: {
         addUser: async (parent, args) => {
             const user = await User.create(args);
-            // letting mongoose handle all that
-            return user;
+            const token = signToken(user);
+            // using signToken from the utils to generate a JWT that will then be returned with the user data
+
+            return {token, user};
         },
 
         login: async (parent, {email, password}) => {
@@ -53,8 +69,9 @@ const resolvers = {
                 throw new AuthenticationError('Incorrect credentials.');
             }
             // there need to be two if statements because, if no user was found, isCorrectPassword will be null and throw everything off
-
-            return user;
+            
+            const token = signToken(user);
+            return {token, user};
         }
     }
 };
