@@ -4,6 +4,7 @@ import {ApolloProvider, ApolloClient, InMemoryCache, createHttpLink} from '@apol
 // apolloclient is a constructor that will help connect us to the graphql api
 // inmemorycache caches response data for efficiency
 // createhttplink controls how apollo client makes requests - its middleware, or like it
+import {setContext} from '@apollo/client/link/context';
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 
 import Header from './components/Header';
@@ -21,9 +22,25 @@ const httpLink = createHttpLink({
     uri: '/graphql'
 });
 
+// middleware function
+// adding an authorization property to the headers of each request, including the token if there is one
+// note that setContext takes a function as its argument
+const authLink = setContext((_, { headers }) => {
+    const token = localStorage.getItem('id_token');
+
+    return {
+        headers: {
+            ...headers,
+            authorization: token ? `Bearer ${token}` : ''
+        }
+    }
+});
+
 // instantiate apollo instance w/ cache
 const client = new ApolloClient({
-    link: httpLink,
+    // combining the authLink and httpLink
+    // not totally sure how this works
+    link: authLink.concat(httpLink),
     cache: new InMemoryCache()
 });
 
