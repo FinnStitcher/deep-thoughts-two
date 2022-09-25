@@ -8,7 +8,8 @@ const resolvers = {
     Query: {
         me: async (parent, args, context) => {
             if (context.user) {
-                const userData = await User.findOne({})
+                const {username} = context.user;
+                const userData = await User.findOne({username})
                 .select('-__v -password')
                 .populate('thoughts')
                 .populate('friends');
